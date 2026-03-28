@@ -9,6 +9,7 @@ import Dashboard from "@/pages/Dashboard";
 import CreateGoal from "@/pages/CreateGoal";
 import GoalDetail from "@/pages/GoalDetail";
 import Feed from "@/pages/Feed";
+import SkylineView from "@/pages/SkylineView";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/create-goal" component={CreateGoal} />
       <Route path="/goal/:id" component={GoalDetail} />
       <Route path="/feed" component={Feed} />
+      <Route path="/skyline" component={SkylineView} />
       <Route component={NotFound} />
     </Switch>
   );

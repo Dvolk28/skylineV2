@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
-import { Building2, Plus, LayoutDashboard, Globe, LogOut, LogIn } from "lucide-react";
+import { Building2, Plus, LayoutDashboard, Globe, LogOut, LogIn, Landmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Navbar() {
@@ -10,9 +10,11 @@ export function Navbar() {
   const navItems = isAuthenticated
     ? [
         { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/skyline", label: "Skyline", icon: Landmark },
         { href: "/feed", label: "Global Feed", icon: Globe },
       ]
     : [
+        { href: "/skyline", label: "Skyline", icon: Landmark },
         { href: "/feed", label: "Global Feed", icon: Globe },
       ];
 

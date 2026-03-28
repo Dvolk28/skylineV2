@@ -1,0 +1,12 @@
+packages:
+  "framer-motion": "For smooth page transitions and glowing building animations"
+  "date-fns": "For formatting progress update timestamps"
+  "react-hook-form": "For robust form state management"
+  "@hookform/resolvers": "For Zod schema validation in forms"
+images:
+  - path: "artifacts/skyline/public/images/cleveland-bg.png"
+    description: "Dark moody professional stylized illustration of the Cleveland skyline at night, deep purple gradients, glowing neon lights, sleek minimalistic modern geometric aesthetic without text"
+    aspect_ratio: "16:9"
+notes:
+  - "User auth is handled via @workspace/replit-auth-web"
+  - "API hooks and schemas are generated and imported from @workspace/api-client-react"

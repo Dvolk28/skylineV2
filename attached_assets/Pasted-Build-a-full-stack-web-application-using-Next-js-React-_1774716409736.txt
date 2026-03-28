@@ -1,0 +1,106 @@
+Build a full-stack web application using Next.js (React) with Supabase for authentication and database.
+
+The app is called "Skyline".
+
+Core Concept:
+
+Skyline is a platform where users set goals, track progress, and visualize collective ambition through a Cleveland skyline-themed interface. Each user can create goals, post updates, and view a public feed of other users’ goals.
+
+Tech Stack:
+Next.js (App Router)
+React
+Tailwind CSS for styling
+Supabase for:
+Authentication
+PostgreSQL database
+API calls
+Use Supabase client library
+Styling Requirements:
+Clean, modern UI
+Purple-themed aesthetic (gradients, dark mode preferred)
+Skyline-inspired homepage:
+Background includes a stylized Cleveland skyline silhouette
+Use simple SVG or CSS shapes to represent buildings
+Goals should visually correspond to buildings (each goal = a building/node conceptually)
+Smooth animations (hover effects, transitions)
+Responsive design for mobile and desktop
+Pages:
+1. Landing Page (/)
+Hero section with title "Skyline"
+Short description of the platform
+Button to sign up or log in
+Visual Cleveland skyline graphic in the background or header
+CTA to join
+2. Auth Pages
+Signup
+Login
+Use Supabase Auth (email/password)
+3. Dashboard (/dashboard)
+Display user’s goals
+Button to create a new goal
+List goals with:
+Title
+Description
+Progress updates
+Status (in progress / completed)
+Ability to mark goal as completed
+4. Create Goal Page (/create-goal)
+Form:
+Title
+Description
+Category
+City (default Cleveland)
+Submit saves to Supabase
+5. Goal Detail Page (/goal/[id])
+Shows:
+Goal details
+Progress updates
+Form to add a new update
+Show timeline of updates
+6. Public Feed (/feed)
+Shows all users’ goals
+Filter by category or city
+Each goal card shows:
+Title
+Creator username
+Status
+Short description
+Functional Requirements:
+Users must be authenticated to create goals or updates
+Public feed is viewable after login
+Goals are linked to users
+Updates are linked to goals
+Allow users to mark goals as completed
+Supabase Integration:
+Use Supabase client in the app
+Implement:
+signUp
+signIn
+signOut
+session persistence
+Fetch and insert data using Supabase queries
+Skyline Visualization (MVP Version):
+On the dashboard, display a simple skyline-style layout:
+Each goal is represented visually as a “building card”
+Completed goals appear brighter or highlighted
+In-progress goals appear dimmer
+Use CSS grid or flexbox to simulate skyline alignment
+Optional: Add subtle animation when a goal is completed
+UX Details:
+Navbar with:
+Logo ("Skyline")
+Links: Dashboard, Feed, Create Goal
+Logout button
+Clean spacing and consistent components
+Use reusable components for GoalCard, Navbar, etc.
+Environment Variables:
+SUPABASE_URL
+SUPABASE_ANON_KEY
+Deliverables:
+Fully working Next.js app
+Organized components
+Connected to Supabase
+Clean UI with skyline-themed design
+No placeholder logic—real working authentication and database integration
+
+PROMPT END

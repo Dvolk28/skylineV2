@@ -1,15 +1,22 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Skyline API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: Auth
+    description: Browser and mobile authentication endpoints.
+  - name: goals
+    description: Goal management
+  - name: updates
+    description: Goal progress updates
+  - name: users
+    description: User profile
 paths:
   /healthz:
     get:
@@ -24,7 +31,319 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/user:
+    get:
+      tags: [Auth]
+      operationId: getCurrentAuthUser
+      summary: Get the currently authenticated user
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationSessionHeader'
+        - $ref: '#/components/parameters/SessionCookie'
+      responses:
+        '200':
+          description: Auth status resolved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUserEnvelope'
+
+  /login:
+    get:
+      tags: [Auth]
+      operationId: beginBrowserLogin
+      summary: Start the browser OIDC login flow
+      parameters:
+        - name: returnTo
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to the OIDC authorization endpoint.
+
+  /callback:
+    get:
+      tags: [Auth]
+      operationId: handleBrowserLoginCallback
+      summary: Complete the browser OIDC login flow
+      parameters:
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: iss
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uri
+      responses:
+        '302':
+          description: Redirect on success or failure.
+
+  /logout:
+    get:
+      tags: [Auth]
+      operationId: logoutBrowserSession
+      summary: Clear the session and begin OIDC logout
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationSessionHeader'
+        - $ref: '#/components/parameters/SessionCookie'
+      responses:
+        '302':
+          description: Redirect to the OIDC provider logout URL.
+
+  /mobile-auth/token-exchange:
+    post:
+      tags: [Auth]
+      operationId: exchangeMobileAuthorizationCode
+      summary: Exchange a mobile OIDC code for a session token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MobileTokenExchangeRequest'
+      responses:
+        '200':
+          description: Session created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileTokenExchangeSuccess'
+        '400':
+          description: Missing or invalid required fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          description: Token did not contain usable claims.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          description: Token exchange failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /mobile-auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logoutMobileSession
+      summary: Delete a mobile session token
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationSessionHeader'
+      responses:
+        '200':
+          description: Logout processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutSuccess'
+
+  /goals:
+    get:
+      operationId: listGoals
+      tags: [goals]
+      summary: List all public goals (feed)
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: city
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of goals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoalListResponse"
+    post:
+      operationId: createGoal
+      tags: [goals]
+      summary: Create a new goal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGoalRequest"
+      responses:
+        "201":
+          description: Goal created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoalResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /goals/mine:
+    get:
+      operationId: listMyGoals
+      tags: [goals]
+      summary: List current user's goals
+      responses:
+        "200":
+          description: List of user's goals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoalListResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /goals/{id}:
+    get:
+      operationId: getGoal
+      tags: [goals]
+      summary: Get a single goal by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Goal details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoalDetailResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+    patch:
+      operationId: updateGoal
+      tags: [goals]
+      summary: Update a goal (e.g., mark complete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateGoalRequest"
+      responses:
+        "200":
+          description: Goal updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoalResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /goals/{id}/updates:
+    get:
+      operationId: listGoalUpdates
+      tags: [updates]
+      summary: Get all updates for a goal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of updates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoalUpdateListResponse"
+    post:
+      operationId: createGoalUpdate
+      tags: [updates]
+      summary: Add a progress update to a goal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGoalUpdateRequest"
+      responses:
+        "201":
+          description: Update created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoalUpdateResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
 components:
+  parameters:
+    AuthorizationSessionHeader:
+      name: Authorization
+      in: header
+      required: false
+      description: Opaque session token — `Bearer <sid>`.
+      schema:
+        type: string
+    SessionCookie:
+      name: sid
+      in: cookie
+      required: false
+      description: Browser session cookie.
+      schema:
+        type: string
+
   schemas:
     HealthStatus:
       type: object
@@ -34,3 +353,189 @@ components:
       required:
         - status
 
+    AuthUser:
+      type: object
+      required: [id, email, firstName, lastName, profileImageUrl]
+      properties:
+        id:
+          type: string
+        email:
+          type: [string, 'null']
+          format: email
+        firstName:
+          type: [string, 'null']
+        lastName:
+          type: [string, 'null']
+        profileImageUrl:
+          type: [string, 'null']
+
+    AuthUserEnvelope:
+      type: object
+      required: [user]
+      properties:
+        user:
+          oneOf:
+            - $ref: '#/components/schemas/AuthUser'
+            - type: 'null'
+
+    MobileTokenExchangeRequest:
+      type: object
+      required: [code, code_verifier, redirect_uri, state]
+      properties:
+        code:
+          type: string
+          minLength: 1
+        code_verifier:
+          type: string
+          minLength: 1
+        redirect_uri:
+          type: string
+          minLength: 1
+          format: uri
+        state:
+          type: string
+          minLength: 1
+        nonce:
+          type: string
+          minLength: 1
+
+    MobileTokenExchangeSuccess:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+
+    LogoutSuccess:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          const: true
+
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    Goal:
+      type: object
+      required: [id, userId, title, description, category, city, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        city:
+          type: string
+        status:
+          type: string
+          enum: [in_progress, completed]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        authorName:
+          type: [string, 'null']
+        authorImage:
+          type: [string, 'null']
+
+    GoalResponse:
+      type: object
+      required: [goal]
+      properties:
+        goal:
+          $ref: "#/components/schemas/Goal"
+
+    GoalListResponse:
+      type: object
+      required: [goals]
+      properties:
+        goals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Goal"
+
+    GoalDetailResponse:
+      type: object
+      required: [goal, updates]
+      properties:
+        goal:
+          $ref: "#/components/schemas/Goal"
+        updates:
+          type: array
+          items:
+            $ref: "#/components/schemas/GoalUpdate"
+
+    CreateGoalRequest:
+      type: object
+      required: [title, description, category]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        category:
+          type: string
+        city:
+          type: string
+          default: "Cleveland"
+
+    UpdateGoalRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [in_progress, completed]
+        title:
+          type: string
+        description:
+          type: string
+
+    GoalUpdate:
+      type: object
+      required: [id, goalId, userId, content, createdAt]
+      properties:
+        id:
+          type: integer
+        goalId:
+          type: integer
+        userId:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        authorName:
+          type: [string, 'null']
+        authorImage:
+          type: [string, 'null']
+
+    GoalUpdateResponse:
+      type: object
+      required: [update]
+      properties:
+        update:
+          $ref: "#/components/schemas/GoalUpdate"
+
+    GoalUpdateListResponse:
+      type: object
+      required: [updates]
+      properties:
+        updates:
+          type: array
+          items:
+            $ref: "#/components/schemas/GoalUpdate"

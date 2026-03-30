@@ -13,13 +13,10 @@ import {
 declare global {
   namespace Express {
     interface User extends AuthUser {}
-
     interface Request {
       isAuthenticated(): this is AuthedRequest;
-
       user?: User | undefined;
     }
-
     export interface AuthedRequest {
       user: User;
     }
@@ -32,15 +29,10 @@ async function refreshIfExpired(
 ): Promise<SessionData | null> {
   const now = Math.floor(Date.now() / 1000);
   if (!session.expires_at || now <= session.expires_at) return session;
-
   if (!session.refresh_token) return null;
-
   try {
     const config = await getOidcConfig();
-    const tokens = await oidc.refreshTokenGrant(
-      config,
-      session.refresh_token,
-    );
+    const tokens = await oidc.refreshTokenGrant(config, session.refresh_token);
     session.access_token = tokens.access_token;
     session.refresh_token = tokens.refresh_token ?? session.refresh_token;
     session.expires_at = tokens.expiresIn()
@@ -58,6 +50,7 @@ export async function authMiddleware(
   res: Response,
   next: NextFunction,
 ) {
+  // Fixed: Added explicit 'this' type for the function context
   req.isAuthenticated = function (this: Request) {
     return this.user != null;
   } as Request["isAuthenticated"];

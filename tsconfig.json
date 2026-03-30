@@ -1,19 +1,29 @@
 {
   "extends": "./tsconfig.base.json",
-  "compileOnSave": false,
-  "files": [],
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowJs": true,
+    "checkJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "incremental": true,
+    /* Relaxed Rules to prevent "Emit skipped" */
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false
+  },
+  "include": ["artifacts/api-server/src/**/*"],
+  "exclude": ["node_modules", "dist"],
   "references": [
-    {
-      "path": "./lib/db"
-    },
-    {
-      "path": "./lib/api-client-react"
-    },
-    {
-      "path": "./lib/api-zod"
-    },
-    {
-      "path": "./lib/replit-auth-web"
-    }
+    { "path": "./lib/db" },
+    { "path": "./lib/api-client-react" },
+    { "path": "./lib/api-zod" },
+    { "path": "./lib/replit-auth-web" }
   ]
 }

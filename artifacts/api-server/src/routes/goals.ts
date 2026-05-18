@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, goalsTable, goalUpdatesTable, usersTable } from "@workspace/db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, type SQL } from "drizzle-orm";
 import {
   ListGoalsQueryParams,
   CreateGoalBody,
@@ -19,7 +19,7 @@ router.get("/goals", async (req, res) => {
     const category = query.success ? query.data.category : undefined;
     const city = query.success ? query.data.city : undefined;
 
-    let conditions = [];
+    const conditions: SQL[] = [];
     if (category) conditions.push(eq(goalsTable.category, category));
     if (city) conditions.push(eq(goalsTable.city, city));
 

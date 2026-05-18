@@ -14,11 +14,8 @@ declare global {
   namespace Express {
     interface User extends AuthUser {}
     interface Request {
-      isAuthenticated(): this is AuthedRequest;
+      isAuthenticated(): this is Request & { user: User };
       user?: User | undefined;
-    }
-    export interface AuthedRequest {
-      user: User;
     }
   }
 }

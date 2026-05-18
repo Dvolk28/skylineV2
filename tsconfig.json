@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
@@ -13,6 +13,7 @@
     "isolatedModules": true,
     "noEmit": false,
     "incremental": true,
+    "types": ["node"],
     /* Relaxed Rules to prevent "Emit skipped" */
     "strict": false,
     "noImplicitAny": false,

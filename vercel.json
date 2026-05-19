@@ -3,8 +3,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/artifacts/api-server/src/index.ts"
+      "destination": "/artifacts/api-server/dist/index.mjs"
     }
-  ],
-  "framework": null
+  ]
 }

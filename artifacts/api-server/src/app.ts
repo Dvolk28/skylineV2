@@ -2,7 +2,7 @@ import express, { type Express } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { pinoHttp } from "pino-http"; // Changed to named import
-import router from "./routes/index";
+import router from "./routes/index.js";
 import { logger } from "./lib/logger";
 import { authMiddleware } from "./middlewares/authMiddleware";
 import type { IncomingMessage, ServerResponse } from "http"; // Added for typing
